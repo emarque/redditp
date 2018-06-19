@@ -271,13 +271,13 @@ $(function () {
 	var initState = function () {
 		var nsfwByCookie = getCookie(cookieNames.nsfwCookie);
 		if (nsfwByCookie === undefined) {
-			rp.settings.nsfw = true;
+			$("#nsfw").prop("checked", rp.settings.nsfw);
 		} else {
 			rp.settings.nsfw = (nsfwByCookie === "true");
 			$("#nsfw").prop("checked", rp.settings.nsfw);
 		}
 		$('#nsfw').change(updateNsfw);
-
+		
 		var autoByCookie = getCookie(cookieNames.shouldAutoNextSlideCookie);
 		if (autoByCookie === undefined) {
 			updateAutoNext();
@@ -932,6 +932,10 @@ $(function () {
 			}
 		});
 		updateKioskMode();
+		
+		$('#timeToNextSlide').val(rp.settings.timeToNextSlide);
+		$("#nsfw").prop("checked", rp.settings.nsfw);
+		
 		rp.subredditUrl = rp.urlData[0];
 		getVars = rp.urlData[1];
 
