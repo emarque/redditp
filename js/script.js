@@ -1,7 +1,6 @@
 /*
   You can save the HTML file and use it locally btw like so:
     file:///wherever/index.html?/r/aww
-
   Check out the source at:
   https://github.com/ubershmekel/redditp
 */
@@ -14,10 +13,11 @@ rp.settings = {
     // Speed of the animation
     animationSpeed: 1000,
     shouldAutoNextSlide: true,
-    timeToNextSlide: 6 * 1000,
+    timeToNextSlide: 25 * 1000,
     cookieDays: 300,
     goodExtensions: ['.jpg', '.jpeg', '.gif', '.bmp', '.png'],
-    nsfw: true
+    nsfw: false,
+	kioskMode: true
 };
 
 rp.session = {
@@ -217,6 +217,25 @@ $(function () {
         setCookie(cookieNames.shouldAutoNextSlideCookie, rp.settings.shouldAutoNextSlide);
         resetNextSlideTimer();
     };
+	
+	var updateKioskMode = function() 
+	{
+		if (rp.settings.kioskMode === true)
+		{
+			$("#prevButton").hide();
+			$("#nextButton").hide();
+			$("#controlsDiv").hide();
+			$(".collapser").hide();
+			$("#recommend").hide();
+		} 
+		else 
+		{
+			$("#prevButton").show();
+			$("#nextButton").show();
+			$("#controlsDiv").show();
+			$(".collapser").show();
+		}
+	}
 
     var toggleFullScreen = function() {
         var elem = document.getElementById('page');
@@ -711,20 +730,20 @@ $(function () {
     var decodeUrl = function (url) {
         return decodeURIComponent(url.replace(/\+/g, " "));
     };
-    rp.getRestOfUrl = function () {
+	rp.getRestOfUrl = function () {
         // Separate to before the question mark and after
         // Detect predefined reddit url paths. If you modify this be sure to fix
         // .htaccess
         // This is a good idea so we can give a quick 404 page when appropriate.
         
-        var regexS = "(/(?:(?:r/)|(?:imgur/a/)|(?:u(?:ser)?/)|(?:domain/)|(?:search))[^&#?]*)[?]?(.*)";
+        var regexS = "(/(?:(?:r/)|(?:imgur/a/)|(?:u(?:ser)?/)|(?:domain/)|(?:search))[^&#?!]*)[?]?([^&#?!]*)[!]?(.*)";
         var regex = new RegExp(regexS);
         var results = regex.exec(window.location.href);
         //log(results);
         if (results === null) {
-            return ["", ""];
+            return ["", "", ""];
         } else {
-            return [results[1], decodeUrl(results[2])];
+            return [results[1], decodeUrl(results[2]), decodeUrl(results[3])];
         }
     };
 
@@ -906,6 +925,13 @@ $(function () {
     var setupUrls = function() {
         rp.urlData = rp.getRestOfUrl();
         //log(rp.urlData)
+		rp.urlData[2].split("&").forEach(function(part) {
+			var item = part.split("=");
+			if (rp.settings.indexOf(item[0]) != -1){
+				rp.settings[item[0]] = decodeURIComponent(item[1]);
+			}
+		});
+		updateKioskMode();
         rp.subredditUrl = rp.urlData[0];
         getVars = rp.urlData[1];
         
@@ -930,7 +956,6 @@ $(function () {
             subredditName = rp.subredditUrl + getVarsQuestionMark;
         }
         
-
         var visitSubredditUrl = rp.redditBaseUrl + rp.subredditUrl + getVarsQuestionMark;
         
         // truncate and display subreddit name in the control box
@@ -975,7 +1000,6 @@ $(function () {
 /*rp.flattenRedditData = function(data) {
     // Parse comments, get all links
     // https://www.reddit.com/r/photoshopbattles/comments/7i5ipw/psbattle_this_hyped_up_mannequin/.json?jsonp=?&
-
     var queue = [];
     var urls = [];
     if (data && data.data && data.data.children) {
@@ -989,7 +1013,6 @@ $(function () {
             }
         }
     }
-
     var urlChildren = [];
     for (var i = 0; i < children.length; i++) {
         var item = children[i];
@@ -998,7 +1021,6 @@ $(function () {
             urlChildren.push(item);
             continue;
         }
-
         // keep digging for more urls, remove this one
         if (item.data) {
             var newChildren = rp.flattenRedditData(item.data.replies);
@@ -1012,7 +1034,6 @@ $(function () {
             continue;
         }
     }
-
     return urls;
 }*/
 
