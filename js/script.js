@@ -13,7 +13,7 @@ rp.settings = {
 	// Speed of the animation
 	animationSpeed: 1000,
 	shouldAutoNextSlide: true,
-	timeToNextSlide: 25 * 1000,
+	timeToNextSlide: 25,
 	cookieDays: 300,
 	goodExtensions: ['.jpg', '.jpeg', '.gif', '.bmp', '.png'],
 	nsfw: false,
@@ -561,7 +561,8 @@ $(function () {
 		// Loop or auto next slide
 		// TODO: make this update every time you check/uncheck auto-play
 		if (rp.settings.shouldAutoNextSlide) {
-			clearTimeout(rp.session.nextSlideTimeoutId);
+			//clearTimeout(rp.session.nextSlideTimeoutId);
+			setTimeout(rp.session.nextSlideTimeoutId, parseFloat(rp.settings.timeToNextSlide) * 2000)
 			vid_jq.removeAttr('loop');
 		}
 		var onEndFunc = function (/*e*/) {
